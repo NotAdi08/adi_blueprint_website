@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(function(){var S={BACKGROUND:'blueprint',THEME_SWITCH:true,LOADING_SCREEN:false,DEBUG_GRID:false};
+try{var x=new XMLHttpRequest();x.open('GET','settings.ts?v='+Date.now(),false);x.send();if(x.status<400){var re=/export\s+const\s+(\w+)\s*=\s*([^;\n]+)/g,m;while((m=re.exec(x.responseText))){try{S[m[1]]=JSON.parse(m[2].trim());}catch(e){}}}}catch(e){}
+window.BACKGROUND=S.BACKGROUND;window.THEME_SWITCH=S.THEME_SWITCH!==false;window.LOADING_SCREEN=!!S.LOADING_SCREEN;window.DEBUG_GRID=!!S.DEBUG_GRID;})();
+</script>
+<script>
+(function(){var d=document.documentElement,t='dark';if(window.THEME_SWITCH){var s=null;try{s=localStorage.getItem('adi-theme');}catch(e){}t=(s==='light'||s==='dark')?s:((window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark');}d.setAttribute('data-theme',t);d.style.colorScheme=t;})();
+</script>
+<style>html{background:#101830}html[data-theme="light"]{background:#E7EBF4}</style>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+:root, :root[data-theme="dark"] { color-scheme:dark; --rule:rgba(242,242,243,0.7); --pg-minor:rgba(242,242,243,0.25); --pg-major:rgba(242,242,243,0.45); --pg-cell:rgba(242,242,243,0.12); --tbox-border:rgba(242,242,243,0.6); --grid-rgb:242,242,243; --grid-minor:0.03; --grid-major:0.07; --grid-plus:0.18; --grid-glow-minor:0.12; --grid-glow-major:0.24; --grid-glow-plus:0.45; --light-only:0; --card-media:#101830; --wire-filter:none; --page:#101830; --surface:#101830; --surface-hover:#16203E; --media:#101830; --media-muted:#8A8D94; --track:#101830; --border:#26282D; --ink:#F2F2F3; --body:#C9CBD0; --muted:#8A8D94; --status:#3FB950; --nav-bg:rgba(10,10,11,0.82); --shadow:rgba(0,0,0,0.45); --selection:rgba(242,242,243,0.2); --topo-rgb:138,141,148; --topo-min:0.12; --topo-rest:0.14; --topo-index:0.26; --topo-max:0.45; }
+:root[data-theme="light"] { color-scheme:light; --rule:rgba(10,10,11,0.7); --pg-minor:rgba(10,10,11,0.25); --pg-major:rgba(10,10,11,0.45); --pg-cell:rgba(10,10,11,0.12); --tbox-border:rgba(10,10,11,0.6); --grid-rgb:10,10,11; --grid-minor:0.04; --grid-major:0.08; --grid-plus:0.2; --grid-glow-minor:0.14; --grid-glow-major:0.26; --grid-glow-plus:0.5; --light-only:1; --card-media:#E7EBF4; --wire-filter:invert(1); --page:#E7EBF4; --surface:#E7EBF4; --surface-hover:#DFE4EE; --track:#D5D8DE; --border:#D5D8DE; --ink:#0A0A0B; --body:#3A3D44; --muted:#62666E; --status:#1A7F37; --nav-bg:rgba(245,245,246,0.82); --shadow:rgba(10,10,11,0.12); --selection:rgba(10,10,11,0.15); --topo-rgb:10,10,11; --topo-min:0.08; --topo-rest:0.08; --topo-index:0.14; --topo-max:0.3; }
+html.theme-instant, html.theme-instant *, html.theme-instant *::before, html.theme-instant *::after { transition:none !important; animation-duration:0s !important; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration:200ms; animation-timing-function:ease; }
+@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation:none; } }
+html { overflow-anchor:auto; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
+html, body { margin:0; padding:0; overscroll-behavior-y:none; background:var(--page); color:var(--body); font-family:'Inter', system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:var(--ink); text-decoration:none; }
+a:hover { color:var(--ink); }
+::selection { background:var(--selection); }
+:focus-visible { outline:1px solid var(--ink); outline-offset:2px; }
+</style>
+</helmet>
+<sc-if value="{{ bgBlueprint }}" hint-placeholder-val="{{ true }}"><x-import component-from-global-scope="blueprint-grid" from="./blueprint-grid.js" hint-size="0px,0px"></x-import></sc-if>
+<sc-if value="{{ bgTopo }}" hint-placeholder-val="{{ false }}"><x-import component-from-global-scope="topo-background" from="./topo-background.js" hint-size="0px,0px"></x-import></sc-if>
+<div style="position:relative; z-index:1; min-height:100vh; color:var(--body); font-family:'Inter', system-ui, sans-serif;">
+  <div ref="{{ colRef }}" aria-hidden="true" style="position:fixed; top:var(--nav-h, 0px); bottom:0; left:0; right:0; max-width:1128px; margin:0 auto; box-sizing:border-box; border-left:1px solid var(--rule); border-right:1px solid var(--rule); background:var(--page); pointer-events:none; z-index:-1;"></div>
+  <nav ref="{{ navRef }}" style="position:sticky; top:0; margin:0; z-index:10; background:var(--page); border-bottom:1px solid var(--rule);">
+    <a href="#/" onClick="{{ goAbout }}" style="position:absolute; z-index:1; left:{{ m.wordLeft }}; top:16px; padding-top:7px; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:600; font-size:22px; line-height:20px; letter-spacing:0.01em; color:var(--ink);">adi's blueprint</a>
+    <div style="position:relative; max-width:1080px; margin:0 auto; padding:16px {{ navPadX }}; min-height:{{ m.navMinH }}; display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
+      <a href="#/" onClick="{{ goAbout }}" style="display:{{ m.deskNav }}; position:relative; isolation:isolate; font-size:16px; font-weight:500; padding:9px 19px; border-radius:0; border-color:{{ nav.about.b }}; color:{{ nav.about.c }}; transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">About Me</a>
+      <div ref="{{ menuWrapRef }}" onMouseEnter="{{ menuEnter }}" onMouseLeave="{{ menuLeave }}" style="display:{{ m.deskNav }};">
+        <a ref="{{ tabRef }}" href="#/" aria-haspopup="true" aria-expanded="{{ menuExpanded }}" aria-controls="projects-menu" onClick="{{ tabClick }}" onTouchStart="{{ tabTouch }}" onKeyDown="{{ tabKey }}" style="position:relative; isolation:isolate; font-size:16px; font-weight:500; padding:9px 19px; border-radius:0; border-color:{{ nav.projects.b }}; color:{{ nav.projects.c }}; transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">Projects</a>
+        <div id="projects-menu" role="menu" aria-label="Projects" onKeyDown="{{ menuKey }}" style="position:absolute; z-index:20; top:calc(100% - 14px); left:50%; width:min(720px, calc(100vw - 32px)); padding-top:22px; box-sizing:border-box; opacity:{{ menuOpacity }}; visibility:{{ menuVis }}; transform:translate(-50%, {{ menuY }}); transition:opacity 180ms ease, transform 180ms ease, visibility 180ms;">
+          <div style="position:relative; isolation:isolate; background:var(--surface); border-color:var(--border); border-radius:0; padding:11px; display:flex; flex-wrap:wrap; gap:8px; box-shadow:0 18px 40px var(--shadow);" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+              <a ref="{{ m0.ref }}" role="menuitem" href="#/projects/3" aria-current="{{ m0.current }}" tabindex="-1" onClick="{{ closeMenu }}" style="position:relative; isolation:isolate; flex:1 1 190px; min-width:0; display:flex; flex-direction:column; gap:6px; padding:15px 17px; border-radius:0; border-color:{{ m0.border }}; background:{{ m0.bg }}; color:var(--ink); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface-hover);">
+                <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">01</span>
+                <span style="font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-size:16px; font-weight:500;">6 DOF Arm (Armie)</span>
+                <span style="font-size:16px; line-height:1.45; color:var(--muted);">A quiet desk robot that tidies up and hands me things while I work.</span>
+              </a>
+              <a ref="{{ m1.ref }}" role="menuitem" href="#/projects/4" aria-current="{{ m1.current }}" tabindex="-1" onClick="{{ closeMenu }}" style="position:relative; isolation:isolate; flex:1 1 190px; min-width:0; display:flex; flex-direction:column; gap:6px; padding:15px 17px; border-radius:0; border-color:{{ m1.border }}; background:{{ m1.bg }}; color:var(--ink); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface-hover);">
+                <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">02</span>
+                <span style="font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-size:16px; font-weight:500;">Mach 5</span>
+                <span style="font-size:16px; line-height:1.45; color:var(--muted);">A VEX competition robot for Team 1138B, my senior-year build</span>
+              </a>
+              <a ref="{{ m2.ref }}" role="menuitem" href="#/projects/1" aria-current="{{ m2.current }}" tabindex="-1" onClick="{{ closeMenu }}" style="position:relative; isolation:isolate; flex:1 1 190px; min-width:0; display:flex; flex-direction:column; gap:6px; padding:15px 17px; border-radius:0; border-color:{{ m2.border }}; background:{{ m2.bg }}; color:var(--ink); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface-hover);">
+                <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">03</span>
+                <span style="font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-size:16px; font-weight:500;">Blaze (V3)</span>
+                <span style="font-size:16px; line-height:1.45; color:var(--muted);">A VEX High Stakes competition robot for Team 1138B</span>
+              </a>
+              <a ref="{{ m3.ref }}" role="menuitem" href="#/projects/2" aria-current="{{ m3.current }}" tabindex="-1" onClick="{{ closeMenu }}" style="position:relative; isolation:isolate; flex:1 1 190px; min-width:0; display:flex; flex-direction:column; gap:6px; padding:15px 17px; border-radius:0; border-color:{{ m3.border }}; background:{{ m3.bg }}; color:var(--ink); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface-hover);">
+                <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">04</span>
+                <span style="font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-size:16px; font-weight:500;">Breakthrough 2.0 (V6)</span>
+                <span style="font-size:16px; line-height:1.45; color:var(--muted);">A VEX Over Under competition robot for Team 1138B</span>
+              </a>
+          </div>
+        </div>
+      </div>
+      <a href="#/" onClick="{{ goCerts }}" style="display:{{ m.deskNav }}; position:relative; isolation:isolate; font-size:16px; font-weight:500; padding:9px 19px; border-radius:0; border-color:{{ nav.certifications.b }}; color:{{ nav.certifications.c }}; transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">Certifications</a>
+      <a href="#/" onClick="{{ goAwards }}" style="display:{{ m.deskNav }}; position:relative; isolation:isolate; font-size:16px; font-weight:500; padding:9px 19px; border-radius:0; border-color:{{ nav.awards.b }}; color:{{ nav.awards.c }}; transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">Awards</a>
+      <sc-if value="{{ m.on }}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{ toggleMob }}" aria-label="Menu" aria-expanded="{{ m.openAttr }}" aria-controls="mobile-menu" style="position:absolute; isolation:isolate; top:16px; right:62px; width:38px; height:38px; padding:0; margin:0; display:flex; align-items:center; justify-content:center; border:none; border-color:var(--border); border-radius:0; background:transparent; color:var(--ink); cursor:pointer; -webkit-appearance:none; appearance:none;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style="display:block; stroke-width:1.6; stroke-linecap:square;"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>
+        </button>
+      </sc-if>
+      <sc-if value="{{ themeOn }}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{ toggleTheme }}" aria-label="{{ themeLabel }}" title="{{ themeLabel }}" style="position:absolute; isolation:isolate; top:16px; right:{{ m.themeRight }}; width:38px; height:38px; padding:0; margin:0; display:flex; align-items:center; justify-content:center; border:none; border-color:transparent; border-radius:0; background:transparent; color:var(--muted); font:inherit; cursor:pointer; -webkit-appearance:none; appearance:none; transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+          <sc-if value="{{ isDark }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style="display:block; stroke-width:1.6; stroke-linecap:round;"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"></path></svg></sc-if>
+          <sc-if value="{{ isLight }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" style="display:block; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></sc-if>
+        </button>
+      </sc-if>
+    </div>
+    <sc-if value="{{ m.open }}" hint-placeholder-val="{{ false }}">
+      <div id="mobile-menu" style="position:absolute; left:0; right:0; top:100%; z-index:20; background:var(--page); border-bottom:1px solid var(--rule); display:flex; flex-direction:column;">
+        <a href="#/" onClick="{{ mobAbout }}" style="display:block; padding:12px 16px; font-size:16px; font-weight:500; color:var(--ink); border-top:1px solid var(--border);">About Me</a>
+        <a href="#/projects/3" onClick="{{ closeMob }}" style="display:block; padding:12px 16px; font-size:16px; font-weight:500; color:var(--ink); border-top:1px solid var(--border);">6 DOF Arm (Armie)</a>
+        <a href="#/projects/4" onClick="{{ closeMob }}" style="display:block; padding:12px 16px; font-size:16px; font-weight:500; color:var(--ink); border-top:1px solid var(--border);">Mach 5</a>
+        <a href="#/projects/1" onClick="{{ closeMob }}" style="display:block; padding:12px 16px; font-size:16px; font-weight:500; color:var(--ink); border-top:1px solid var(--border);">Blaze (V3)</a>
+        <a href="#/projects/2" onClick="{{ closeMob }}" style="display:block; padding:12px 16px; font-size:16px; font-weight:500; color:var(--ink); border-top:1px solid var(--border);">Breakthrough 2.0 (V6)</a>
+        <a href="#/" onClick="{{ mobCerts }}" style="display:block; padding:12px 16px; font-size:16px; font-weight:500; color:var(--ink); border-top:1px solid var(--border);">Certifications</a>
+        <a href="#/" onClick="{{ mobAwards }}" style="display:block; padding:12px 16px; font-size:16px; font-weight:500; color:var(--ink); border-top:1px solid var(--border);">Awards</a>
+      </div>
+    </sc-if>
+  </nav>
+  <div aria-hidden="true" style="position:relative; max-width:1128px; margin:0 auto; height:24px; pointer-events:none;">
+    <span style="position:absolute; left:-6px; top:-7px; width:13px; height:13px; background:linear-gradient(var(--rule), var(--rule)) center / 13px 1px no-repeat, linear-gradient(var(--rule), var(--rule)) center / 1px 13px no-repeat;"></span>
+    <span style="position:absolute; right:-6px; top:-7px; width:13px; height:13px; background:linear-gradient(var(--rule), var(--rule)) center / 13px 1px no-repeat, linear-gradient(var(--rule), var(--rule)) center / 1px 13px no-repeat;"></span>
+    <span style="position:absolute; left:24px; right:24px; top:12px; height:1px; background:var(--muted);"></span>
+    <span style="position:absolute; left:24px; top:6px; width:1px; height:13px; background:var(--muted);"></span>
+    <span style="position:absolute; right:24px; top:6px; width:1px; height:13px; background:var(--muted);"></span>
+    <span style="position:absolute; left:50%; top:0; transform:translateX(-50%); height:24px; line-height:24px; padding:0 12px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); background:var(--page); white-space:nowrap;">{{ dimLabel }}</span>
+  </div>
+
+  <div ref="{{ pageRef }}">
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width:1080px; margin:0 auto; padding:0 {{ m.padX }}; display:flex; flex-direction:column; gap:96px;">
+<section id="about" data-screen-label="Hero / About" style="padding-top:0; margin-bottom:-96px; display:grid; grid-template-columns:{{ hero.cols }}; column-gap:48px; row-gap:12px; align-items:start;">
+      <div style="position:relative; grid-column:1; grid-row:{{ hero.headRow }}; align-self:stretch; min-width:0; margin-bottom:{{ hero.headMb }};" style-before="content:''; position:absolute; inset:-6px; pointer-events:none; z-index:3; background:linear-gradient(var(--border),var(--border)) left top/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) left top/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) right top/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) right top/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) left bottom/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) left bottom/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) right bottom/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) right bottom/1px 8px no-repeat;"><div style="position:relative; isolation:isolate; width:100%; height:{{ hero.headH }}; border-radius:0; border-color:var(--rule); background:var(--media); overflow:hidden;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;"><img src="images/headshot-tall.webp" width="720" height="1254" decoding="async" alt="Aditya Singh" style="display:block; width:100%; height:100%; object-fit:cover; object-position:center top;"></div></div>
+        <div data-panel="hero" data-snapbox="" onMouseMove="{{ panelMove }}" onMouseLeave="{{ panelLeave }}" style="grid-column:{{ hero.c }}; grid-row:{{ hero.rPanel }}; min-width:0; position:relative; isolation:isolate; box-sizing:border-box; background-color:var(--surface); background-image:{{ m.gridBg }}; background-size:120px 120px, 120px 120px, 24px 24px, 24px 24px; border-color:var(--rule); padding:{{ m.panelPad }}; display:flex; flex-direction:column; gap:12px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+          <span aria-hidden="true" style="position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;"><span aria-hidden="true" style="position:absolute; left:0; top:0; z-index:0; width:25px; height:25px; background:var(--pg-cell); transform:translate({{ p_hero.x }}, {{ p_hero.y }}); opacity:{{ p_hero.op }}; transition:transform 80ms ease, opacity 80ms ease; pointer-events:none;"></span></span>
+          <span style="position:absolute; top:0; right:0; z-index:3; height:24px; line-height:24px; padding:0 12px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); background:var(--surface);">{{ p_hero.label }}</span>
+          <div data-tbox="" data-snapbox="" style="position:relative; isolation:isolate; z-index:1; align-self:flex-start; box-sizing:border-box; background:var(--surface); border-color:var(--tbox-border); padding:24px; display:flex; flex-direction:column; gap:0;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;"><h1 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:clamp(38px, 4.4vw, 54px); line-height:48px; letter-spacing:-0.01em; color:var(--ink); text-wrap:balance;">Hi, I'm Adi. I just like to build stuff.</h1></div>
+        </div>
+        <p style="grid-column:{{ hero.c }}; grid-row:{{ hero.rP1 }}; min-width:0; margin:0; font-size:17px; line-height:1.65; color:var(--body); text-wrap:pretty;">I'm studying Mechanical Engineering at Georgia Tech. I have seven years of competitive robotics behind me. In high school I competed in both FRC and VEX in a highly competitive region, and I was part of the strategy, design, build, and manufacturing process on both.</p>
+        <p style="grid-column:{{ hero.c }}; grid-row:{{ hero.rP2 }}; min-width:0; margin:0; font-size:17px; line-height:1.65; color:var(--body); text-wrap:pretty;">It taught me that failing is fine, but time is money, and if you don't design with intent, you fall behind. Rapid prototyping is great for killing bad ideas, but it's hard to commit to one path if you don't do it properly.</p>
+        <p style="grid-column:{{ hero.c }}; grid-row:{{ hero.rP3 }}; min-width:0; margin:0; font-size:17px; line-height:1.65; color:var(--body); text-wrap:pretty;">I also see engineering as a form of expression, so I like my robots to be interesting and good to look at.</p>
+        <div style="grid-column:{{ hero.c }}; grid-row:{{ hero.rBtn }}; min-width:0; display:flex; flex-wrap:wrap; gap:10px; padding-top:4px;">
+          <a href="https://www.linkedin.com/in/aditya-singh-41b3152bb/" target="_blank" rel="noopener noreferrer" style="position:relative; isolation:isolate; font-size:16px; font-weight:500; padding:12px 23px; border-radius:0; border-color:var(--border); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease; background:var(--page);" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">LinkedIn</a>
+          <a href="https://github.com/NotAdi08" target="_blank" rel="noopener noreferrer" style="position:relative; isolation:isolate; font-size:16px; font-weight:500; padding:12px 23px; border-radius:0; border-color:var(--border); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease; background:var(--page);" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">GitHub</a>
+          <a href="https://www.youtube.com/@MidnightAdi" target="_blank" rel="noopener noreferrer" style="position:relative; isolation:isolate; font-size:16px; font-weight:500; padding:12px 23px; border-radius:0; border-color:var(--border); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease; background:var(--page);" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">YouTube</a>
+        </div>
+    </section>
+
+    <section id="projects" data-screen-label="Projects" style="margin-bottom:-48px; display:flex; flex-direction:column; gap:24px;">
+      <div style="display:flex; flex-direction:column; gap:14px;"><div data-panel="projects" data-snapbox="" onMouseMove="{{ panelMove }}" onMouseLeave="{{ panelLeave }}" style="position:relative; isolation:isolate; box-sizing:border-box; background-color:var(--surface); background-image:{{ m.gridBg }}; background-size:120px 120px, 120px 120px, 24px 24px, 24px 24px; border-color:var(--rule); padding:{{ m.panelPadP }}; display:flex; flex-direction:column; gap:12px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+          <span aria-hidden="true" style="position:absolute; left:0; top:0; z-index:0; width:25px; height:25px; background:var(--pg-cell); transform:translate({{ p_projects.x }}, {{ p_projects.y }}); opacity:{{ p_projects.op }}; transition:transform 80ms ease, opacity 80ms ease; pointer-events:none;"></span>
+          <span style="position:absolute; top:0; right:0; z-index:3; height:24px; line-height:24px; padding:0 12px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); background:var(--surface);">{{ p_projects.label }}</span>
+          <div data-tbox="" data-snapbox="" style="position:relative; isolation:isolate; z-index:1; align-self:flex-start; box-sizing:border-box; background:var(--surface); border-color:var(--tbox-border); padding:24px; display:flex; flex-direction:column; gap:0;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;"><h2 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:{{ m.h2 }}; line-height:48px; color:var(--ink);">Projects</h2></div>
+        </div></div>
+      <div ref="{{ c2.wrapRef }}" role="button" tabindex="0" aria-expanded="{{ c2.expanded }}" aria-label="6 DOF Arm (Armie)" onMouseLeave="{{ c2.onLeave }}" onTouchStart="{{ c2.onTouch }}" onClick="{{ c2.onClick }}" onKeyDown="{{ c2.onKey }}" onFocus="{{ c2.onFocus }}" style="display:flex; flex-direction:column; width:100%; cursor:pointer; font-family:'Inter', system-ui, sans-serif; -webkit-tap-highlight-color:transparent;">
+        <div onMouseEnter="{{ c2.onEnter }}" style="position:relative; width:100%;" style-before="content:''; position:absolute; inset:-6px; pointer-events:none; z-index:3; background:linear-gradient(var(--border),var(--border)) left top/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) left top/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) right top/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) right top/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) left bottom/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) left bottom/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) right bottom/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) right bottom/1px 8px no-repeat;">
+          <div style="position:relative; isolation:isolate; width:100%; aspect-ratio:16 / 9; border-radius:0; overflow:hidden; background:var(--card-media); border-color:{{ c2.frameBorder }}; transition:border-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transform:scale({{ c2.zoom }}); transition:transform 700ms cubic-bezier(.2,.7,.2,1); will-change:transform; background:var(--card-media);">
+              <sc-if value="{{ isDark }}" hint-placeholder-val="{{ true }}"><img src="images/gripper/p3-01-gripper-wireframe.webp" alt="Isometric wireframe drawing of the spiral cam gripper" loading="eager" decoding="async" fetchpriority="high" style="display:block; width:100%; height:100%; object-fit:contain; padding:28px 40px; box-sizing:border-box;"></sc-if>
+              <sc-if value="{{ isLight }}" hint-placeholder-val="{{ false }}"><img src="images/gripper/p3-01-gripper-wireframe-inv.webp" alt="Isometric wireframe drawing of the spiral cam gripper" loading="eager" decoding="async" fetchpriority="high" style="display:block; width:100%; height:100%; object-fit:contain; padding:28px 40px; box-sizing:border-box;"></sc-if>
+            </div>
+            <span style="position:absolute; left:20px; bottom:16px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Armie · spiral cam gripper wireframe</span>
+            <span style="position:absolute; right:20px; top:16px; font-size:13px; font-family:'IBM Plex Mono', ui-monospace, monospace; color:var(--muted); opacity:{{ c2.hintOpacity }}; transition:opacity 300ms ease; letter-spacing:0.06em; text-transform:uppercase;">Hover or tap to inspect</span>
+          </div>
+        </div>
+        <div ref="{{ c2.panelRef }}" style="height:{{ c2.h }}; overflow:hidden; opacity:{{ c2.panelOpacity }}; transition:{{ c2.tr }};">
+          <div style="overflow:hidden; min-height:0;">
+            <div ref="{{ c2.contentRef }}" style="padding-top:10px; box-sizing:border-box;">
+              <div style="position:relative; isolation:isolate; background:var(--surface); border-color:var(--border); border-radius:0; padding:25px 29px; display:flex; flex-direction:column; gap:12px; transform:translateY({{ c2.slide }}); opacity:{{ c2.panelOpacity }}; visibility:{{ c2.vis }}; transition:{{ c2.innerTr }}; will-change:transform, opacity;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+                <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 16px;">
+                  <h3 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:32px; line-height:1.1; color:var(--ink);">6 DOF Arm (Armie)</h3>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">SolidWorks</span>
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">NEMA 14 stepper</span>
+                  </div>
+                </div>
+                <p style="margin:0; font-size:16px; line-height:1.6; color:var(--body); text-wrap:pretty;">Armie is a quiet six-axis robotic arm I'm designing in SolidWorks to live on my desk, tidy up, and hand me things while I work.</p>
+                <p style="margin:0; font-size:16px; line-height:1.65; color:var(--muted); text-wrap:pretty;">I'm starting with the gripper: a spiral cam driven by a NEMA 14 stepper.</p>
+                <a href="#/projects/3" tabindex="{{ c2.linkTab }}" onClick="{{ stopProp }}" onKeyDown="{{ linkKey }}" style="position:relative; isolation:isolate; align-self:flex-start; margin-top:4px; font-size:16px; font-weight:500; padding:11px 21px; border-radius:0; border-color:var(--border); color:var(--ink); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">View project →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div ref="{{ c3.wrapRef }}" role="button" tabindex="0" aria-expanded="{{ c3.expanded }}" aria-label="Mach 5" onMouseLeave="{{ c3.onLeave }}" onTouchStart="{{ c3.onTouch }}" onClick="{{ c3.onClick }}" onKeyDown="{{ c3.onKey }}" onFocus="{{ c3.onFocus }}" style="display:flex; flex-direction:column; width:100%; cursor:pointer; font-family:'Inter', system-ui, sans-serif; -webkit-tap-highlight-color:transparent;">
+        <div onMouseEnter="{{ c3.onEnter }}" style="position:relative; width:100%;" style-before="content:''; position:absolute; inset:-6px; pointer-events:none; z-index:3; background:linear-gradient(var(--border),var(--border)) left top/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) left top/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) right top/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) right top/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) left bottom/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) left bottom/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) right bottom/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) right bottom/1px 8px no-repeat;">
+          <div style="position:relative; isolation:isolate; width:100%; aspect-ratio:16 / 9; border-radius:0; overflow:hidden; background:var(--card-media); border-color:{{ c3.frameBorder }}; transition:border-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transform:scale({{ c3.zoom }}); transition:transform 700ms cubic-bezier(.2,.7,.2,1); will-change:transform; background:var(--card-media);">
+              <sc-if value="{{ isDark }}" hint-placeholder-val="{{ true }}"><img src="images/mach5/p4-01-wireframe.webp" alt="Side wireframe drawing of Mach 5" loading="eager" decoding="async" fetchpriority="high" style="display:block; width:100%; height:100%; object-fit:contain; padding:28px 40px; box-sizing:border-box;"></sc-if>
+              <sc-if value="{{ isLight }}" hint-placeholder-val="{{ false }}"><img src="images/mach5/p4-01-wireframe-inv.webp" alt="Side wireframe drawing of Mach 5" loading="eager" decoding="async" fetchpriority="high" style="display:block; width:100%; height:100%; object-fit:contain; padding:28px 40px; box-sizing:border-box;"></sc-if>
+            </div>
+            <span style="position:absolute; left:20px; bottom:16px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Mach 5 · side wireframe</span>
+            <span style="position:absolute; right:20px; top:16px; font-size:13px; font-family:'IBM Plex Mono', ui-monospace, monospace; color:var(--muted); opacity:{{ c3.hintOpacity }}; transition:opacity 300ms ease; letter-spacing:0.06em; text-transform:uppercase;">Hover or tap to inspect</span>
+          </div>
+        </div>
+        <div ref="{{ c3.panelRef }}" style="height:{{ c3.h }}; overflow:hidden; opacity:{{ c3.panelOpacity }}; transition:{{ c3.tr }};">
+          <div style="overflow:hidden; min-height:0;">
+            <div ref="{{ c3.contentRef }}" style="padding-top:10px; box-sizing:border-box;">
+              <div style="position:relative; isolation:isolate; background:var(--surface); border-color:var(--border); border-radius:0; padding:25px 29px; display:flex; flex-direction:column; gap:12px; transform:translateY({{ c3.slide }}); opacity:{{ c3.panelOpacity }}; visibility:{{ c3.vis }}; transition:{{ c3.innerTr }}; will-change:transform, opacity;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+                <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; color:var(--muted); margin-bottom:-6px; letter-spacing:0.06em; text-transform:uppercase;">Winter 2025 – Spring 2026</span>
+                <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 16px;">
+                  <h3 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:32px; line-height:1.1; color:var(--ink);">Mach 5</h3>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">VEX</span>
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">Odometry</span>
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">12-piece plastic budget</span>
+                  </div>
+                </div>
+                <p style="margin:0; font-size:16px; line-height:1.6; font-weight:600; color:var(--ink);">Ranked top 5 at a national level event with a couple of Chinese teams</p>
+                <p style="margin:0; font-size:16px; line-height:1.6; color:var(--body); text-wrap:pretty;">Mach 5 is a VEX competition robot for Team 1138B, built during my senior year on a season budget of just 12 pieces of plastic.</p>
+                <p style="margin:0; font-size:16px; line-height:1.65; color:var(--muted); text-wrap:pretty;">It performed well and consistently, but we didn't adapt to the game's shifting meta. 4th-seeded alliance at the Diamond in the Desert Signature Event, a national event with international teams.</p>
+                <a href="#/projects/4" tabindex="{{ c3.linkTab }}" onClick="{{ stopProp }}" onKeyDown="{{ linkKey }}" style="position:relative; isolation:isolate; align-self:flex-start; margin-top:4px; font-size:16px; font-weight:500; padding:11px 21px; border-radius:0; border-color:var(--border); color:var(--ink); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">View project →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div ref="{{ c0.wrapRef }}" role="button" tabindex="0" aria-expanded="{{ c0.expanded }}" aria-label="Blaze (V3)" onMouseLeave="{{ c0.onLeave }}" onTouchStart="{{ c0.onTouch }}" onClick="{{ c0.onClick }}" onKeyDown="{{ c0.onKey }}" onFocus="{{ c0.onFocus }}" style="display:flex; flex-direction:column; width:100%; cursor:pointer; font-family:'Inter', system-ui, sans-serif; -webkit-tap-highlight-color:transparent;">
+        <div onMouseEnter="{{ c0.onEnter }}" style="position:relative; width:100%;" style-before="content:''; position:absolute; inset:-6px; pointer-events:none; z-index:3; background:linear-gradient(var(--border),var(--border)) left top/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) left top/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) right top/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) right top/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) left bottom/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) left bottom/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) right bottom/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) right bottom/1px 8px no-repeat;">
+          <div style="position:relative; isolation:isolate; width:100%; aspect-ratio:16 / 9; border-radius:0; overflow:hidden; background:var(--card-media); border-color:{{ c0.frameBorder }}; transition:border-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transform:scale({{ c0.zoom }}); transition:transform 700ms cubic-bezier(.2,.7,.2,1); will-change:transform; background:var(--card-media);">
+              <sc-if value="{{ isDark }}" hint-placeholder-val="{{ true }}"><img src="images/blaze/p1-wireframe.webp" alt="Side wireframe drawing of Blaze (V3) holding a mobile goal stacked with rings" loading="lazy" decoding="async" fetchpriority="auto" style="display:block; width:100%; height:100%; object-fit:contain; padding:28px 40px; box-sizing:border-box;"></sc-if>
+              <sc-if value="{{ isLight }}" hint-placeholder-val="{{ false }}"><img src="images/blaze/p1-wireframe-inv.webp" alt="Side wireframe drawing of Blaze (V3) holding a mobile goal stacked with rings" loading="lazy" decoding="async" fetchpriority="auto" style="display:block; width:100%; height:100%; object-fit:contain; padding:28px 40px; box-sizing:border-box;"></sc-if>
+            </div>
+            <span style="position:absolute; left:20px; bottom:16px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Blaze (V3) · side wireframe</span>
+            <span style="position:absolute; right:20px; top:16px; font-size:13px; font-family:'IBM Plex Mono', ui-monospace, monospace; color:var(--muted); opacity:{{ c0.hintOpacity }}; transition:opacity 300ms ease; letter-spacing:0.06em; text-transform:uppercase;">Hover or tap to inspect</span>
+          </div>
+        </div>
+        <div ref="{{ c0.panelRef }}" style="height:{{ c0.h }}; overflow:hidden; opacity:{{ c0.panelOpacity }}; transition:{{ c0.tr }};">
+          <div style="overflow:hidden; min-height:0;">
+            <div ref="{{ c0.contentRef }}" style="padding-top:10px; box-sizing:border-box;">
+              <div style="position:relative; isolation:isolate; background:var(--surface); border-color:var(--border); border-radius:0; padding:25px 29px; display:flex; flex-direction:column; gap:12px; transform:translateY({{ c0.slide }}); opacity:{{ c0.panelOpacity }}; visibility:{{ c0.vis }}; transition:{{ c0.innerTr }}; will-change:transform, opacity;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+                <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; color:var(--muted); margin-bottom:-6px; letter-spacing:0.06em; text-transform:uppercase;">Spring 2025</span>
+                <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 16px;">
+                  <h3 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:32px; line-height:1.1; color:var(--ink);">Blaze (V3)</h3>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">VEX High Stakes</span>
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">Pneumatics</span>
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">CNC polycarbonate</span>
+                  </div>
+                </div>
+                <p style="margin:0; font-size:16px; line-height:1.6; font-weight:600; color:var(--ink);">Ranked top 5 in Southern California</p>
+                <p style="margin:0; font-size:16px; line-height:1.6; color:var(--body); text-wrap:pretty;">Blaze is the third version of our VEX High Stakes robot: a fast six-motor drive, a touch-it-own-it intake, a pneumatic mobile goal clamp, and a one-motor wall stake arm.</p>
+                <p style="margin:0; font-size:16px; line-height:1.65; color:var(--muted); text-wrap:pretty;">It made us tournament finalists at Supernova Spectacular. Ranked 6th at the 2025 California Region 4 State Championship (6-2 in qualifications) and competed as the 4th-seeded alliance.</p>
+                <a href="#/projects/1" tabindex="{{ c0.linkTab }}" onClick="{{ stopProp }}" onKeyDown="{{ linkKey }}" style="position:relative; isolation:isolate; align-self:flex-start; margin-top:4px; font-size:16px; font-weight:500; padding:11px 21px; border-radius:0; border-color:var(--border); color:var(--ink); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">View project →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div ref="{{ c1.wrapRef }}" role="button" tabindex="0" aria-expanded="{{ c1.expanded }}" aria-label="Breakthrough 2.0 (V6)" onMouseLeave="{{ c1.onLeave }}" onTouchStart="{{ c1.onTouch }}" onClick="{{ c1.onClick }}" onKeyDown="{{ c1.onKey }}" onFocus="{{ c1.onFocus }}" style="display:flex; flex-direction:column; width:100%; cursor:pointer; font-family:'Inter', system-ui, sans-serif; -webkit-tap-highlight-color:transparent;">
+        <div onMouseEnter="{{ c1.onEnter }}" style="position:relative; width:100%;" style-before="content:''; position:absolute; inset:-6px; pointer-events:none; z-index:3; background:linear-gradient(var(--border),var(--border)) left top/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) left top/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) right top/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) right top/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) left bottom/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) left bottom/1px 8px no-repeat, linear-gradient(var(--border),var(--border)) right bottom/8px 1px no-repeat, linear-gradient(var(--border),var(--border)) right bottom/1px 8px no-repeat;">
+          <div style="position:relative; isolation:isolate; width:100%; aspect-ratio:16 / 9; border-radius:0; overflow:hidden; background:var(--card-media); border-color:{{ c1.frameBorder }}; transition:border-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transform:scale({{ c1.zoom }}); transition:transform 700ms cubic-bezier(.2,.7,.2,1); will-change:transform; background:var(--card-media);">
+              <sc-if value="{{ isDark }}" hint-placeholder-val="{{ true }}"><img src="images/breakthrough/p2-01-wireframe.webp" alt="Side-view wireframe drawing of Breakthrough 2.0 (V6)" loading="lazy" decoding="async" fetchpriority="auto" style="display:block; width:100%; height:100%; object-fit:contain; padding:28px 40px; box-sizing:border-box;"></sc-if>
+              <sc-if value="{{ isLight }}" hint-placeholder-val="{{ false }}"><img src="images/breakthrough/p2-01-wireframe-inv.webp" alt="Side-view wireframe drawing of Breakthrough 2.0 (V6)" loading="lazy" decoding="async" fetchpriority="auto" style="display:block; width:100%; height:100%; object-fit:contain; padding:28px 40px; box-sizing:border-box;"></sc-if>
+            </div>
+            <span style="position:absolute; left:20px; bottom:16px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Breakthrough 2.0 (V6) · wireframe</span>
+            <span style="position:absolute; right:20px; top:16px; font-size:13px; font-family:'IBM Plex Mono', ui-monospace, monospace; color:var(--muted); opacity:{{ c1.hintOpacity }}; transition:opacity 300ms ease; letter-spacing:0.06em; text-transform:uppercase;">Hover or tap to inspect</span>
+          </div>
+        </div>
+        <div ref="{{ c1.panelRef }}" style="height:{{ c1.h }}; overflow:hidden; opacity:{{ c1.panelOpacity }}; transition:{{ c1.tr }};">
+          <div style="overflow:hidden; min-height:0;">
+            <div ref="{{ c1.contentRef }}" style="padding-top:10px; box-sizing:border-box;">
+              <div style="position:relative; isolation:isolate; background:var(--surface); border-color:var(--border); border-radius:0; padding:25px 29px; display:flex; flex-direction:column; gap:12px; transform:translateY({{ c1.slide }}); opacity:{{ c1.panelOpacity }}; visibility:{{ c1.vis }}; transition:{{ c1.innerTr }}; will-change:transform, opacity;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+                <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; color:var(--muted); margin-bottom:-6px; letter-spacing:0.06em; text-transform:uppercase;">Spring 2024</span>
+                <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 16px;">
+                  <h3 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:32px; line-height:1.1; color:var(--ink);">Breakthrough 2.0 (V6)</h3>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">VEX Over Under</span>
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">Pneumatics</span>
+                    <span style="position:relative; isolation:isolate; font-family:'Inter', system-ui, sans-serif; font-size:13px; font-weight:500; color:var(--muted); border-color:var(--border); border-radius:0; padding:5px 9px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">Custom plastics</span>
+                  </div>
+                </div>
+                <p style="margin:0; font-size:16px; line-height:1.6; font-weight:600; color:var(--ink);">Ranked top 5 in Southern California</p>
+                <p style="margin:0; font-size:16px; line-height:1.6; color:var(--body); text-wrap:pretty;">V6 was built to fix what went wrong at our last tournament: slow scoring, a bent drivetrain, an unreliable hang, and a heavy robot.</p>
+                <p style="margin:0; font-size:16px; line-height:1.65; color:var(--muted); text-wrap:pretty;">It is lighter, faster, and built around a ram-in scoring strategy. Ranked 5th at the SoCal Regional Championship with a 7-3 record.</p>
+                <a href="#/projects/2" tabindex="{{ c1.linkTab }}" onClick="{{ stopProp }}" onKeyDown="{{ linkKey }}" style="position:relative; isolation:isolate; align-self:flex-start; margin-top:4px; font-size:16px; font-weight:500; padding:11px 21px; border-radius:0; border-color:var(--border); color:var(--ink); transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface);">View project →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="certifications" data-screen-label="Certifications &amp; Awards" style="display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; flex-direction:column; gap:14px;"><div data-panel="certs" data-snapbox="" onMouseMove="{{ panelMove }}" onMouseLeave="{{ panelLeave }}" style="position:relative; isolation:isolate; box-sizing:border-box; margin-bottom:12px; background-color:var(--surface); background-image:{{ m.gridBg }}; background-size:120px 120px, 120px 120px, 24px 24px, 24px 24px; border-color:var(--rule); padding:{{ m.panelPad }}; display:flex; flex-direction:column; gap:12px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+          <span aria-hidden="true" style="position:absolute; left:0; top:0; z-index:0; width:25px; height:25px; background:var(--pg-cell); transform:translate({{ p_certs.x }}, {{ p_certs.y }}); opacity:{{ p_certs.op }}; transition:transform 80ms ease, opacity 80ms ease; pointer-events:none;"></span>
+          <span style="position:absolute; top:0; right:0; z-index:3; height:24px; line-height:24px; padding:0 12px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); background:var(--surface);">{{ p_certs.label }}</span>
+          <div data-tbox="" data-snapbox="" style="position:relative; isolation:isolate; z-index:1; align-self:flex-start; box-sizing:border-box; background:var(--surface); border-color:var(--tbox-border); padding:24px; display:flex; flex-direction:column; gap:0;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;"><h2 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:{{ m.h2 }}; line-height:48px; color:var(--ink);">Certifications</h2></div>
+        </div></div>
+      <div style="display:flex; flex-direction:column;">
+        <div role="button" tabindex="0" aria-expanded="{{ ct0.expanded }}" aria-controls="cert-panel-0" onClick="{{ ct0.toggle }}" onKeyDown="{{ ct0.onKey }}" style="position:relative; isolation:isolate; background:var(--surface); border-color:{{ ct0.border }}; border-radius:0; padding:23px 29px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 24px; cursor:pointer; transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease; -webkit-tap-highlight-color:transparent;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface-hover);">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; font-weight:500; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Certification</span>
+            <span style="font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-size:17px; font-weight:500; color:var(--ink);">AWAITING SCORE: CSWP: Certified SOLIDWORKS Professional</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span style="font-size:16px; color:var(--muted);">Dassault Systèmes</span>
+            <span aria-hidden="true" style="font-size:16px; color:var(--muted); display:inline-block; transform:rotate({{ ct0.chevron }}); transition:transform 400ms ease;">↓</span>
+          </div>
+        </div>
+        <div id="cert-panel-0" ref="{{ ct0.panelRef }}" style="display:grid; grid-template-rows:{{ ct0.rows }}; transition:grid-template-rows 550ms cubic-bezier(.2,.7,.2,1);">
+          <div style="overflow:hidden; min-height:0;">
+            <div ref="{{ ct0.contentRef }}" style="padding-top:10px;">
+              <div style="position:relative; isolation:isolate; background:var(--surface); border-color:var(--border); border-radius:0; padding:25px; display:flex; flex-wrap:wrap; gap:24px; transform:translateY({{ ct0.slide }}); opacity:{{ ct0.opacity }}; transition:transform 550ms cubic-bezier(.2,.7,.2,1), opacity 400ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+                <div style="flex:1 1 220px; display:flex; flex-direction:column; gap:12px;">
+                  <h3 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:30px; line-height:1.1; color:var(--ink);">CSWP: Certified SOLIDWORKS Professional</h3>
+                  <p style="margin:0; font-size:16px; line-height:1.65; color:var(--muted); text-wrap:pretty;">Advanced SOLIDWORKS certification covering complex part modeling, design changes through configurations and equations, and assembly creation and modification.</p>
+                  <span style="font-size:16px; color:var(--muted);">Issued by Dassault Systèmes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column;">
+        <div role="button" tabindex="0" aria-expanded="{{ ct1.expanded }}" aria-controls="cert-panel-1" onClick="{{ ct1.toggle }}" onKeyDown="{{ ct1.onKey }}" style="position:relative; isolation:isolate; background:var(--surface); border-color:{{ ct1.border }}; border-radius:0; padding:23px 29px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 24px; cursor:pointer; transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease; -webkit-tap-highlight-color:transparent;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface-hover);">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; font-weight:500; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Certification</span>
+            <span style="font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-size:17px; font-weight:500; color:var(--ink);">CSWA: Certified SOLIDWORKS Associate</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span style="font-size:16px; color:var(--muted);">Dassault Systèmes</span>
+            <span aria-hidden="true" style="font-size:16px; color:var(--muted); display:inline-block; transform:rotate({{ ct1.chevron }}); transition:transform 400ms ease;">↓</span>
+          </div>
+        </div>
+        <div id="cert-panel-1" ref="{{ ct1.panelRef }}" style="display:grid; grid-template-rows:{{ ct1.rows }}; transition:grid-template-rows 550ms cubic-bezier(.2,.7,.2,1);">
+          <div style="overflow:hidden; min-height:0;">
+            <div ref="{{ ct1.contentRef }}" style="padding-top:10px;">
+              <div style="position:relative; isolation:isolate; background:var(--surface); border-color:var(--border); border-radius:0; padding:25px; display:flex; flex-wrap:wrap; gap:24px; transform:translateY({{ ct1.slide }}); opacity:{{ ct1.opacity }}; transition:transform 550ms cubic-bezier(.2,.7,.2,1), opacity 400ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+                <div style="flex:1 1 220px; display:flex; flex-direction:column; gap:12px;">
+                  <h3 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:30px; line-height:1.1; color:var(--ink);">CSWA: Certified SOLIDWORKS Associate</h3>
+                  <p style="margin:0; font-size:16px; line-height:1.65; color:var(--muted); text-wrap:pretty;">Core SOLIDWORKS certification covering part and assembly modeling, sketching, drawings, and engineering design fundamentals.</p>
+                  <span style="font-size:16px; color:var(--muted);">Issued by Dassault Systèmes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column;">
+        <div role="button" tabindex="0" aria-expanded="{{ ct2.expanded }}" aria-controls="cert-panel-2" onClick="{{ ct2.toggle }}" onKeyDown="{{ ct2.onKey }}" style="position:relative; isolation:isolate; background:var(--surface); border-color:{{ ct2.border }}; border-radius:0; padding:23px 29px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 24px; cursor:pointer; transition:color 150ms ease, border-color 150ms ease, background-color 150ms ease; -webkit-tap-highlight-color:transparent;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;" style-hover="color:var(--ink); border-color:var(--ink); background:var(--surface-hover);">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; font-weight:500; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Certification</span>
+            <span style="font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-size:17px; font-weight:500; color:var(--ink);">HVTSP S2</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span style="font-size:16px; color:var(--muted);">Harvard University Summer Sessions · 2024</span>
+            <span aria-hidden="true" style="font-size:16px; color:var(--muted); display:inline-block; transform:rotate({{ ct2.chevron }}); transition:transform 400ms ease;">↓</span>
+          </div>
+        </div>
+        <div id="cert-panel-2" ref="{{ ct2.panelRef }}" style="display:grid; grid-template-rows:{{ ct2.rows }}; transition:grid-template-rows 550ms cubic-bezier(.2,.7,.2,1);">
+          <div style="overflow:hidden; min-height:0;">
+            <div ref="{{ ct2.contentRef }}" style="padding-top:10px;">
+              <div style="position:relative; isolation:isolate; background:var(--surface); border-color:var(--border); border-radius:0; padding:25px; display:flex; flex-wrap:wrap; gap:24px; transform:translateY({{ ct2.slide }}); opacity:{{ ct2.opacity }}; transition:transform 550ms cubic-bezier(.2,.7,.2,1), opacity 400ms ease;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+                <div style="position:relative; isolation:isolate; flex:1 1 340px; min-width:0; max-width:560px; align-self:flex-start; border-radius:0; border-color:var(--border);" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;"><img src="https://cdn.certifier.io/f72986e1-75ca-4079-ba64-13cfaacc0d76/credentials/thumbnails/01j5sw93hta2njeesbc68419sj/designs/01j5sw395s3xpdv0t2nrygd9wr/open-graph" alt="HVTSP S2 certificate" loading="lazy" style="width:100%; height:auto; display:block; border-radius:0; background:var(--media);"></div>
+                <div style="flex:1 1 220px; display:flex; flex-direction:column; gap:12px;">
+                  <h3 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:30px; line-height:1.1; color:var(--ink);">HVTSP S2</h3>
+                  <span style="font-size:16px; color:var(--muted);">Issued by Harvard University Summer Sessions</span>
+                  <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Issued August 21, 2024</span>
+                  <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; color:var(--muted); overflow-wrap:anywhere; letter-spacing:0.06em; text-transform:uppercase;">Credential ID · 67eb686c-9043-461f-9739-23f8b06ec723</span>
+                  <a href="https://credsverse.com/credentials/67eb686c-9043-461f-9739-23f8b06ec723" target="_blank" rel="noopener noreferrer" style="font-size:16px; font-weight:500; color:var(--ink);">Verify credential →</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="awards" style="display:flex; flex-direction:column; gap:16px; margin-top:80px;">
+        <div style="display:flex; flex-direction:column; gap:14px;"><div data-panel="awards" data-snapbox="" onMouseMove="{{ panelMove }}" onMouseLeave="{{ panelLeave }}" style="position:relative; isolation:isolate; box-sizing:border-box; margin-bottom:12px; background-color:var(--surface); background-image:{{ m.gridBg }}; background-size:120px 120px, 120px 120px, 24px 24px, 24px 24px; border-color:var(--rule); padding:{{ m.panelPad }}; display:flex; flex-direction:column; gap:12px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+          <span aria-hidden="true" style="position:absolute; left:0; top:0; z-index:0; width:25px; height:25px; background:var(--pg-cell); transform:translate({{ p_awards.x }}, {{ p_awards.y }}); opacity:{{ p_awards.op }}; transition:transform 80ms ease, opacity 80ms ease; pointer-events:none;"></span>
+          <span style="position:absolute; top:0; right:0; z-index:3; height:24px; line-height:24px; padding:0 12px; font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); background:var(--surface);">{{ p_awards.label }}</span>
+          <div data-tbox="" data-snapbox="" style="position:relative; isolation:isolate; z-index:1; align-self:flex-start; box-sizing:border-box; background:var(--surface); border-color:var(--tbox-border); padding:24px; display:flex; flex-direction:column; gap:0;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;"><h2 style="margin:0; font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:{{ m.h2 }}; line-height:48px; color:var(--ink);">Awards</h2></div>
+        </div></div>
+      <div style="position:relative; isolation:isolate; background:var(--surface); border-color:var(--border); border-radius:0; padding:23px 29px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 24px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; font-weight:500; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Award</span>
+          <span style="font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-size:17px; font-weight:500; color:var(--ink);">Impact Award and Engineering Inspiration Award (2x)</span>
+          <span style="font-size:16px; color:var(--muted);">FIRST Robotics Competition, World Championship qualifying awards</span>
+        </div>
+        <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">FIRST · 2024, 2025</span>
+        <p style="flex-basis:100%; margin:6px 0 0; font-size:16px; line-height:1.65; color:var(--body); text-wrap:pretty;">Won the Impact Award once and the Engineering Inspiration Award twice, all World Championship qualifying awards. Impact is the most prestigious award in FIRST Robotics Competition, given to the team that best shows sustained excellence and impact in its community. Engineering Inspiration recognizes advancing respect and appreciation for engineering in a team's school and community. We earned them through our service work and by presenting our team to judges.</p>
+      </div>
+      <div style="position:relative; isolation:isolate; background:var(--surface); border-color:var(--border); border-radius:0; padding:23px 29px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 24px;" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; font-weight:500; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Award</span>
+          <span style="font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-size:17px; font-weight:500; color:var(--ink);">VEX Robotics Regional Awards</span>
+          <span style="font-size:16px; color:var(--muted);">10x Tournament Champion, 5x Finalist, Amaze Award</span>
+        </div>
+        <span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">RECF · 2023–2026</span>
+        <p style="flex-basis:100%; margin:6px 0 0; font-size:16px; line-height:1.65; color:var(--body); text-wrap:pretty;">With Team 1138, won ten tournament championships and finished as finalist five times. Also won the Amaze Award for engineering excellence and performance.</p>
+      </div>
+      </div>
+    </section>
+
+    <footer data-screen-label="Footer / title block" style="position:relative; isolation:isolate; margin-bottom:48px; display:flex; flex-wrap:wrap; gap:1px; background:var(--border); border-color:var(--rule);" style-after="content:''; position:absolute; inset:0; border:1px solid; border-color:inherit; border-radius:inherit; pointer-events:none; z-index:2; transition:border-color 150ms ease;">
+      <div style="flex:2 1 288px; min-height:72px; box-sizing:border-box; background:var(--page); padding:12px 24px; display:flex; flex-direction:column; justify-content:center;">
+        <span style="font-family:'Barlow Semi Condensed', 'Inter', sans-serif; font-weight:500; font-size:26px; line-height:36px; color:var(--ink);">Aditya Singh</span>
+        <a href="mailto:foadityas26@gmail.com" style="align-self:flex-start; font-size:16px; line-height:24px; color:var(--muted); transition:color 150ms ease;" style-hover="color:var(--ink);">foadityas26@gmail.com</a>
+        <span style="font-size:16px; line-height:24px; color:var(--muted);">© 2026 Aditya Singh</span>
+      </div>
+      <div style="flex:4 1 480px; min-width:0; display:{{ m.tbGrid }}; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:1px;">
+        <div style="min-height:72px; box-sizing:border-box; background:var(--page); padding:12px; display:flex; flex-direction:column; min-width:0;"><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; line-height:24px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Drawn</span><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; line-height:24px; color:var(--ink); letter-spacing:0.06em; text-transform:uppercase; overflow-wrap:anywhere;">A. Singh</span></div>
+        <div style="min-height:72px; box-sizing:border-box; background:var(--page); padding:12px; display:flex; flex-direction:column; min-width:0;"><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; line-height:24px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Scale</span><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; line-height:24px; color:var(--ink); letter-spacing:0.06em; text-transform:uppercase; overflow-wrap:anywhere;">1 : 1</span></div>
+        <div style="min-height:72px; box-sizing:border-box; background:var(--page); padding:12px; display:flex; flex-direction:column; min-width:0;"><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; line-height:24px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Rev</span><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; line-height:24px; color:var(--ink); letter-spacing:0.06em; text-transform:uppercase; overflow-wrap:anywhere;">2026.11</span></div>
+        <div style="min-height:72px; box-sizing:border-box; background:var(--page); padding:12px; display:flex; flex-direction:column; min-width:0;"><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; line-height:24px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Sheet</span><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; line-height:24px; color:var(--ink); letter-spacing:0.06em; text-transform:uppercase; overflow-wrap:anywhere;">01 / 05</span></div>
+        <div style="min-height:72px; box-sizing:border-box; background:var(--page); padding:12px; display:flex; flex-direction:column; min-width:0;"><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; line-height:24px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Dwg no.</span><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; line-height:24px; color:var(--ink); letter-spacing:0.06em; text-transform:uppercase; overflow-wrap:anywhere;">AS-001</span></div>
+        <div style="min-height:72px; box-sizing:border-box; background:var(--page); padding:12px; display:flex; flex-direction:column; min-width:0;"><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; line-height:24px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Units</span><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; line-height:24px; color:var(--ink); letter-spacing:0.06em; text-transform:uppercase; overflow-wrap:anywhere;">MM</span></div>
+        <div style="min-height:72px; box-sizing:border-box; background:var(--page); padding:12px; display:flex; flex-direction:column; min-width:0;"><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; line-height:24px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Tools</span><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; line-height:24px; color:var(--ink); letter-spacing:0.06em; text-transform:uppercase; overflow-wrap:anywhere;">—</span></div>
+        <div style="min-height:72px; box-sizing:border-box; background:var(--page); padding:12px; display:flex; flex-direction:column; min-width:0;"><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:12px; line-height:24px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase;">Checked</span><span style="font-family:'IBM Plex Mono', ui-monospace, monospace; font-size:13px; line-height:24px; color:var(--ink); letter-spacing:0.06em; text-transform:uppercase; overflow-wrap:anywhere;">—</span></div>
+      </div>
+    </footer>
+  </main>
+  </sc-if>
+  <sc-if value="{{ isProject }}" hint-placeholder-val="{{ false }}">
+    <dc-import name="ProjectPage" pid="{{ project.id }}" on-back="{{ backToProjects }}" hint-size="100%,1600px"></dc-import>
+  </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PROJECTS = [{ id: '3' }, { id: '4' }, { id: '1' }, { id: '2' }];
+const CARD_IDS = ['0', '1', '2', '3'];
+const PRELOAD = ["images/blaze/p1-final-render.webp","images/blaze/p1-render-light.webp","images/blaze/p1-01-overview.webp","images/blaze/p1-03-parts-layout.webp","images/blaze/p1-04-cut-plates.webp","images/blaze/p1-05-drive-base.webp","images/blaze/p1-06-assembly.webp","images/blaze/p1-07-gear-shaft.webp","images/blaze/p1-08-gusset-plates.webp","images/breakthrough/p2-02-render-iso.webp","images/breakthrough/p2-render-light.webp","images/breakthrough/p2-03-final-robot.webp","images/breakthrough/p2-04-intake.webp","images/breakthrough/p2-05-wheel-gear.webp","images/breakthrough/p2-06-kicker.webp","images/breakthrough/p2-07-delrin-part.webp","images/breakthrough/p2-08-cad-field.webp","images/gripper/p3-02-render-iso.webp","images/gripper/p3-render-light.webp","images/gripper/p3-03-top-open.webp","images/gripper/p3-03-top-open-light.webp","images/gripper/p3-04-top-closed.webp","images/gripper/p3-04-top-closed-light.webp","images/gripper/p3-05-front.webp","images/gripper/p3-05-front-light.webp","images/mach5/p4-02-render-iso.webp","images/mach5/p4-render-light.webp","images/gripper/p3-01-gripper-wireframe-inv.webp","images/mach5/p4-01-wireframe-inv.webp","images/blaze/p1-wireframe-inv.webp","images/breakthrough/p2-01-wireframe-inv.webp","images/gripper/p3-01-gripper-wireframe.webp","images/mach5/p4-01-wireframe.webp","images/blaze/p1-wireframe.webp","images/breakthrough/p2-01-wireframe.webp"];
+const SECTIONS = ['about', 'projects', 'certifications', 'awards'];
+const parseRoute = () => {
+  const m = (window.location.hash || '').match(/^#\/projects\/(\d+)/);
+  return m && PROJECTS.some(x => x.id === m[1]) ? m[1] : 'home';
+};
+const CERTS = [0, 1, 2];
+class Component extends DCLogic {
+  state = { theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark', active: 'about', open: [false, false, false], card: null, route: parseRoute(), menuOpen: false, mobOpen: false, vw: window.innerWidth, colW: 0, pcell: null };
+  pageRef = React.createRef(); menuWrapRef = React.createRef(); tabRef = React.createRef();
+  itemRefs = PROJECTS.map(() => React.createRef()); navTouch = 0;
+  cards = {}; lock = false; mouseMode = true; hoverTarget = null;
+  navRef = React.createRef(); colRef = React.createRef();
+  cardRefs = {}; cardEv = {}; cardTouch = {};
+  _cards = this.initCards();
+  initCards() {
+    CARD_IDS.forEach((id) => {
+      const r = { wrap: React.createRef(), panel: React.createRef(), content: React.createRef() };
+      this.cardRefs[id] = r;
+      this.cards[id] = {
+        el: () => r.wrap.current,
+        openBottom: () => { const p = r.panel.current, c = r.content.current; return p && c ? p.getBoundingClientRect().top + c.offsetHeight : 0; },
+      };
+      const recent = () => Date.now() - (this.cardTouch[id] || 0) < 800;
+      const h = () => this.cardHandlers();
+      this.cardEv[id] = {
+        onEnter: () => { if (!recent()) h().hoverCard(id); },
+        onLeave: () => { if (!recent()) h().leaveCard(id); },
+        onTouch: () => { this.cardTouch[id] = Date.now(); },
+        onClick: () => { if (recent()) h().tapCard(id); },
+        onFocus: (e) => { if (recent() || e.target !== r.wrap.current) return; if (e.target.matches(':focus-visible')) h().focusCard(id); },
+        onKey: (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); h().keyCard(id); }
+          else if (e.key === 'Escape') h().closeCard();
+        },
+      };
+    });
+    return true;
+  }
+  panelRefs = CERTS.map(() => React.createRef());
+  contentRefs = CERTS.map(() => React.createRef());
+  navH() { return this.navRef.current ? this.navRef.current.offsetHeight : 64; }
+  reduced() { return matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  applyTheme(t, animate) {
+    const d = document.documentElement;
+    const commit = () => new Promise((res) => {
+      d.classList.add('theme-instant');
+      d.setAttribute('data-theme', t); d.style.colorScheme = t;
+      void d.offsetHeight;
+      const done = () => { void d.offsetHeight; res(); requestAnimationFrame(() => requestAnimationFrame(() => d.classList.remove('theme-instant'))); };
+      if (this.state.theme !== t) this.setState({ theme: t }, done); else done();
+    });
+    if (animate && document.startViewTransition && !this.reduced()) document.startViewTransition(commit);
+    else commit();
+  }
+  componentDidMount() {
+    if (window.THEME_SWITCH !== false && window.matchMedia) {
+      this.mqTheme = matchMedia('(prefers-color-scheme: light)');
+      this.onSysTheme = () => {
+        let s = null; try { s = localStorage.getItem('adi-theme'); } catch (e) {}
+        if (s !== 'light' && s !== 'dark') this.applyTheme(this.mqTheme.matches ? 'light' : 'dark', true);
+      };
+      this.mqTheme.addEventListener?.('change', this.onSysTheme);
+    } else this.applyTheme('dark', false);
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    this.onScroll = () => {
+      if (this.state.route !== 'home') return;
+      const lim = this.navH() + 120;
+      let next = 'about';
+      for (const s of SECTIONS) { const el = document.getElementById(s); if (el && el.getBoundingClientRect().top <= lim) next = s; }
+      const sh = document.documentElement.scrollHeight;
+      if (window.scrollY > 0 && sh > window.innerHeight + 40 && window.innerHeight + window.scrollY >= sh - 4) next = 'awards';
+      if (next !== this.state.active) this.setState({ active: next });
+    };
+    this.onHash = () => {
+      const r = parseRoute();
+      if (r !== this.state.route) { this.setState({ route: r, card: null, menuOpen: false }); requestAnimationFrame(() => this.onRouteChanged()); }
+    };
+    window.addEventListener('hashchange', this.onHash);
+    const onScrollNow = this.onScroll;
+    this.onScroll = () => { if (!this.scrollRaf) this.scrollRaf = requestAnimationFrame(() => { this.scrollRaf = 0; onScrollNow(); }); };
+    if (window.IntersectionObserver) {
+      this.lazyIO = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.loading = 'eager'; this.lazyIO.unobserve(e.target); } }), { rootMargin: '150% 0px' });
+      const scan = () => document.querySelectorAll('img[loading="lazy"]').forEach((im) => { if (!im.__lz) { im.__lz = 1; this.lazyIO.observe(im); } });
+      this.lazyMO = new MutationObserver(scan); this.lazyMO.observe(document.body, { childList: true, subtree: true }); scan();
+    }
+    const idle = window.requestIdleCallback || ((f) => setTimeout(f, 1200));
+    this.preloaded = [];
+    idle(() => PRELOAD.forEach((u, i) => setTimeout(() => { const im = new Image(); im.decoding = 'async'; im.src = u; this.preloaded.push(im); if (im.decode) im.decode().catch(() => {}); }, i * 150)));
+    if (window.ResizeObserver) { this.ro = new ResizeObserver(() => { this.onScroll(); if (this.onLayout) this.onLayout(); }); this.ro.observe(document.body); if (this.navRef.current) this.ro.observe(this.navRef.current); }
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.onScroll();
+    this.ptr = null;
+    this.ptrSeq = 0;
+    this.onPtrMove = (e) => { if (e.pointerType !== 'mouse') return; if (!this.ptr || this.ptr.x !== e.clientX || this.ptr.y !== e.clientY) this.ptrSeq++; this.ptr = { x: e.clientX, y: e.clientY }; };
+    this.onScrollEnd = () => { this.scrolling = false; this.hoverAt(); };
+    this.onHoverScroll = () => {
+      this.scrolling = true;
+      clearTimeout(this.scrollEndT);
+      this.scrollEndT = setTimeout(this.onScrollEnd, 140);
+      if (!this.hoverRaf) this.hoverRaf = requestAnimationFrame(() => { this.hoverRaf = 0; this.hoverAt(); });
+    };
+    if (window.ResizeObserver) {
+      const snapPanels = () => {
+        this.panelRaf = 0;
+        if (this.isAnimating()) { clearTimeout(this.measureT); this.measureT = setTimeout(snapPanels, this.animUntil - performance.now() + 20); return; }
+        CARD_IDS.forEach((id) => {
+          const r = this.cardRefs[id], w = r.wrap.current, c = r.content.current;
+          if (!w || !c) return;
+          const t = Math.ceil((c.offsetHeight - 1) / 24) * 24 + 1;
+          if (Math.abs((parseFloat(w.style.getPropertyValue('--h')) || 0) - t) >= 1) w.style.setProperty('--h', t + 'px');
+        });
+      };
+      snapPanels();
+      this.panelRO = new ResizeObserver(() => { if (!this.panelRaf) this.panelRaf = requestAnimationFrame(snapPanels); });
+      CARD_IDS.forEach((id) => { const r = this.cardRefs[id]; if (r.content.current) this.panelRO.observe(r.content.current.firstElementChild || r.content.current); });
+    }
+    window.addEventListener('pointermove', this.onPtrMove, { passive: true });
+    this.onPtrOut = (e) => { if (!e.relatedTarget) this.ptr = null; };
+    document.addEventListener('mouseout', this.onPtrOut);
+    window.addEventListener('scroll', this.onHoverScroll, { passive: true });
+    if ('onscrollend' in window) window.addEventListener('scrollend', this.onScrollEnd);
+    this.canHover = matchMedia('(hover: hover) and (pointer: fine)').matches && !this.reduced();
+    this.onLayout = () => {
+      const c = this.colRef.current, w = c ? Math.round(c.getBoundingClientRect().width) : 0;
+      document.documentElement.style.setProperty('--nav-h', this.navH() + 'px');
+      if (w !== this.state.colW || window.innerWidth !== this.state.vw) this.setState({ colW: w, vw: window.innerWidth, mobOpen: window.innerWidth < 768 ? this.state.mobOpen : false });
+    };
+    window.addEventListener('resize', this.onLayout);
+    this.onLayout();
+    this.setupSnap();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (!this.snapRaf) this.snapRaf = requestAnimationFrame(() => this.snapBoxes()); });
+    this.onDocDown = (e) => {
+      const mw = this.menuWrapRef.current;
+      if (this.state.menuOpen && mw && !mw.contains(e.target)) this.closeMenu();
+      if (e.pointerType === 'mouse' || this.state.card === null) return;
+      const inside = Object.values(this.cards).some(c => { const el = c.el(); return el && el.contains(e.target); });
+      if (!inside) this.activate(null);
+    };
+    this.onDocKey = (e) => {
+      if (e.key !== 'Escape') return;
+      if (this.state.menuOpen) { const mw = this.menuWrapRef.current; const inMenu = mw && mw.contains(document.activeElement); this.closeMenu(); if (inMenu && this.tabRef.current) this.tabRef.current.focus(); }
+      if (this.state.card !== null) this.activate(null);
+    };
+    document.addEventListener('pointerdown', this.onDocDown, true);
+    document.addEventListener('keydown', this.onDocKey);
+  }
+  componentDidUpdate() { this.setupSnap(); }
+  setupSnap() {
+    if (!window.ResizeObserver) return;
+    if (!this.snapRO) {
+      this.snapSeen = new WeakSet();
+      this.snapRO = new ResizeObserver(() => { if (!this.snapRaf) this.snapRaf = requestAnimationFrame(() => this.snapBoxes()); });
+    }
+    document.querySelectorAll('[data-snapbox]').forEach((el) => { if (!this.snapSeen.has(el)) { this.snapSeen.add(el); this.snapRO.observe(el); } });
+  }
+  sizeTBoxes() {
+    document.querySelectorAll('[data-tbox]').forEach((el) => {
+      const panel = el.parentElement;
+      if (!panel) return;
+      const cs = getComputedStyle(panel);
+      const avail = Math.min(panel.clientWidth - 48, panel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight));
+      const cap = Math.max(25, Math.floor((avail - 1) / 24) * 24 + 1);
+      const prevW = el.style.width;
+      el.style.maxWidth = cap + 'px';
+      el.style.width = 'max-content';
+      const t = Math.min(cap, Math.ceil((el.getBoundingClientRect().width - 1 + 0.01) / 24) * 24 + 1);
+      el.style.width = (prevW === t + 'px' ? prevW : t + 'px');
+    });
+  }
+  snapBoxes() {
+    this.snapRaf = 0;
+    this.sizeTBoxes();
+    document.querySelectorAll('[data-snapbox]').forEach((el) => {
+      const prev = el.style.minHeight;
+      el.style.minHeight = '';
+      const t = Math.ceil((el.offsetHeight - 1) / 24) * 24 + 1;
+      el.style.minHeight = (Math.abs(t - (parseFloat(prev) || 0)) >= 1 ? t : parseFloat(prev)) + 'px';
+    });
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onLayout);
+    if (this.snapRO) this.snapRO.disconnect();
+    cancelAnimationFrame(this.snapRaf); cancelAnimationFrame(this.pmRaf);
+    if (this.mqTheme) this.mqTheme.removeEventListener?.('change', this.onSysTheme);
+        window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('pointermove', this.onPtrMove);
+    document.removeEventListener('mouseout', this.onPtrOut);
+    window.removeEventListener('scroll', this.onHoverScroll);
+    window.removeEventListener('scrollend', this.onScrollEnd);
+    cancelAnimationFrame(this.hoverRaf); clearTimeout(this.scrollEndT); clearTimeout(this.recheckT); clearTimeout(this.scrollIntentT); clearTimeout(this.measureT); clearTimeout(this.animEndT);
+    if (this.panelRO) this.panelRO.disconnect(); cancelAnimationFrame(this.panelRaf);
+    window.removeEventListener('hashchange', this.onHash);
+    cancelAnimationFrame(this.scrollRaf);
+    if (this.lazyIO) this.lazyIO.disconnect(); if (this.lazyMO) this.lazyMO.disconnect();
+    cancelAnimationFrame(this.settleRaf);
+    if (this.ro) this.ro.disconnect();
+    clearTimeout(this.menuOpenT); clearTimeout(this.menuCloseT);
+    document.removeEventListener('pointerdown', this.onDocDown, true);
+    document.removeEventListener('keydown', this.onDocKey);
+    clearTimeout(this.padT); clearTimeout(this.hoverT); clearTimeout(this.closeT); clearTimeout(this.lockT);
+    cancelAnimationFrame(this.anchorRaf);
+  }
+  onRouteChanged() {
+    this.clearTimers(); cancelAnimationFrame(this.anchorRaf); clearTimeout(this.lockT); this.lock = false;
+    cancelAnimationFrame(this.settleRaf);
+    const sec = this.pendingSection, route = this.state.route;
+    this.pendingSection = null; this.pendingInstant = false;
+    window.scrollTo(0, 0);
+    const el = this.pageRef.current;
+    if (el) { el.style.transition = 'none'; el.style.opacity = '0'; void el.offsetHeight; el.style.transition = 'opacity 320ms ease'; el.style.opacity = '1'; }
+    if (!sec || sec === 'about') { if (route === 'home') this.onScroll(); return; }
+    const t0 = performance.now();
+    let good = 0;
+    const go = (t) => {
+      if (this.state.route !== route) return;
+      const target = document.getElementById(sec);
+      const ready = target && Object.keys(this.cards).length >= 3;
+      if (ready) {
+        const want = target.getBoundingClientRect().top + window.scrollY - this.navH() - 24;
+        if (Math.abs(window.scrollY - want) > 2) { window.scrollTo(0, want); good = 0; } else good++;
+      }
+      if (good < 3 && t - t0 < 1500) this.settleRaf = requestAnimationFrame(go);
+      else this.onScroll();
+    };
+    this.settleRaf = requestAnimationFrame(go);
+  }
+  scrollToSection(name, instant) {
+    const behavior = instant || this.reduced() ? 'auto' : 'smooth';
+    if (name === 'about') return window.scrollTo({ top: 0, behavior });
+    const el = document.getElementById(name);
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - this.navH() - 24, behavior });
+  }
+  goSection(name, instant) {
+    this.closeMenu();
+    if (this.state.route === 'home') this.scrollToSection(name, instant);
+    else { this.pendingSection = name; this.pendingInstant = !!instant; window.location.hash = '#/'; }
+  }
+  openMenu() { clearTimeout(this.menuOpenT); clearTimeout(this.menuCloseT); if (!this.state.menuOpen) this.setState({ menuOpen: true }); }
+  closeMenu() { clearTimeout(this.menuOpenT); clearTimeout(this.menuCloseT); if (this.state.menuOpen) this.setState({ menuOpen: false }); }
+  focusItem(i) {
+    const n = this.itemRefs.length, k = ((i % n) + n) % n;
+    requestAnimationFrame(() => requestAnimationFrame(() => { const el = this.itemRefs[k].current; if (el) el.focus(); }));
+  }
+  menuHandlers() {
+    const touchRecent = () => Date.now() - this.navTouch < 800;
+    return {
+      menuEnter: () => {
+        if (touchRecent()) return;
+        clearTimeout(this.menuCloseT);
+        if (!this.state.menuOpen) { clearTimeout(this.menuOpenT); this.menuOpenT = setTimeout(() => this.openMenu(), 120); }
+      },
+      menuLeave: () => {
+        if (touchRecent()) return;
+        clearTimeout(this.menuOpenT);
+        this.menuCloseT = setTimeout(() => this.closeMenu(), 150);
+      },
+      tabTouch: () => { this.navTouch = Date.now(); },
+      tabClick: (e) => {
+        e.preventDefault();
+        if (touchRecent()) { this.state.menuOpen ? this.closeMenu() : this.openMenu(); return; }
+        this.goSection('projects');
+      },
+      tabKey: (e) => {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); this.openMenu(); this.focusItem(0); }
+        else if (e.key === 'Escape') this.closeMenu();
+      },
+      menuKey: (e) => {
+        const idx = this.itemRefs.findIndex(r => r.current === document.activeElement);
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); this.focusItem(idx + 1); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); this.focusItem(idx - 1); }
+        else if (e.key === 'Home') { e.preventDefault(); this.focusItem(0); }
+        else if (e.key === 'End') { e.preventDefault(); this.focusItem(-1); }
+        else if (e.key === ' ' && idx >= 0) { e.preventDefault(); this.itemRefs[idx].current.click(); }
+        else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); this.closeMenu(); if (this.tabRef.current) this.tabRef.current.focus(); }
+        else if (e.key === 'Tab') this.closeMenu();
+      },
+      closeMenu: () => this.closeMenu(),
+    };
+  }
+  clearTimers() { clearTimeout(this.hoverT); clearTimeout(this.closeT); this.hoverTarget = null; }
+  activate(id) {
+    const old = this.state.card;
+    this.clearTimers();
+    if (old === id) return;
+    this.setState({ card: id });
+    this.lastSwitch = performance.now();
+    this.animUntil = this.reduced() ? 0 : this.lastSwitch + 240;
+    clearTimeout(this.animEndT); clearTimeout(this.recheckT);
+    this.animEndT = setTimeout(() => this.hoverAt(), this.reduced() ? 0 : 250);
+    if (old !== null) this.lastClosed = { id: old, t: this.lastSwitch, seq: this.ptrSeq };
+  }
+  cardAtPointer() {
+    if (!this.ptr) return null;
+    const hit = document.elementFromPoint(this.ptr.x, this.ptr.y);
+    if (!hit) return null;
+    for (const k in this.cards) { const el = this.cards[k].el(); if (el && el.contains(hit)) return k; }
+    return null;
+  }
+  isAnimating() { return !!this.animUntil && performance.now() < this.animUntil; }
+  gateWait(id, auto) {
+    const now = performance.now();
+    let wait = 0;
+    if (this.isAnimating()) wait = this.animUntil - now + 10;
+    if (auto && this.lastSwitch && now - this.lastSwitch < 300) wait = Math.max(wait, 300 - (now - this.lastSwitch));
+    const lc = this.lastClosed;
+    if (lc && lc.id === id && lc.seq === this.ptrSeq && now - lc.t < 400) wait = Math.max(wait, 400 - (now - lc.t));
+    return wait;
+  }
+  recheckLater(ms) {
+    clearTimeout(this.recheckT);
+    this.recheckT = setTimeout(() => { this.recheckT = 0; this.hoverAt(); }, Math.ceil(ms) + 5);
+  }
+  hoverAt() {
+    if (!this.ptr || this.lock || this.state.route !== 'home') return;
+    const id = this.cardAtPointer();
+    if (id === null || id === this.state.card) { if (this.scrollPending && id !== this.scrollPending) { clearTimeout(this.scrollIntentT); this.scrollPending = null; } return; }
+    const wait = this.gateWait(id, true);
+    if (wait > 0) return this.recheckLater(wait);
+    if (this.scrollPending === id) return;
+    clearTimeout(this.scrollIntentT); this.scrollPending = id;
+    this.scrollIntentT = setTimeout(() => {
+      this.scrollPending = null;
+      if (this.cardAtPointer() !== id || this.state.card === id) return;
+      if (this.gateWait(id, true) > 0) return this.hoverAt();
+      this.mouseMode = true;
+      this.activate(id);
+    }, this.state.card === null ? 0 : 70);
+  }
+  reHover() {
+    if (!this.mouseMode || this.lock) return;
+    let hovered = null;
+    for (const k in this.cards) { const el = this.cards[k].el(); if (el && el.matches(':hover')) hovered = k; }
+    if (hovered === null) { if (this.state.card !== null) this.activate(null); }
+    else if (hovered !== this.state.card) this.activate(hovered);
+  }
+  cardHandlers() {
+    return {
+      registerCard: (id, api) => { this.cards[id] = api; },
+      unregisterCard: (id) => { delete this.cards[id]; },
+      hoverCard: (id) => {
+        this.mouseMode = true;
+        if (this.lock) return;
+        if (id !== this.state.card) { const w = this.gateWait(id); if (w > 0) return this.recheckLater(w); }
+        clearTimeout(this.closeT);
+        const cur = this.state.card;
+        if (cur === null) this.activate(id);
+        else if (cur === id) { clearTimeout(this.hoverT); this.hoverTarget = null; }
+        else {
+          clearTimeout(this.hoverT); this.hoverTarget = id;
+          this.hoverT = setTimeout(() => this.activate(id), 70);
+        }
+      },
+      leaveCard: (id) => {
+        this.mouseMode = true;
+        if (this.lock || this.scrolling) return;
+        if (this.hoverTarget === id) { clearTimeout(this.hoverT); this.hoverTarget = null; }
+        if (this.state.card === id) {
+          clearTimeout(this.closeT);
+          this.closeT = setTimeout(() => { if (this.state.card === id && this.hoverTarget === null) this.activate(null); }, 80);
+        }
+      },
+      tapCard: (id) => { this.mouseMode = false; this.activate(this.state.card === id ? null : id); },
+      keyCard: (id) => { this.mouseMode = false; this.activate(this.state.card === id ? null : id); },
+      focusCard: (id) => { this.mouseMode = false; if (this.state.card !== null && this.state.card !== id) this.activate(id); },
+      closeCard: () => this.activate(null),
+    };
+  }
+  setOpen(i, v) { this.setState(s => { const o = s.open.slice(); o[i] = v; return { open: o }; }); }
+  toggle(i) {
+    const open = !this.state.open[i];
+    this.setOpen(i, open);
+  }
+  renderVals() {
+    const a = this.state.active;
+    const certVals = {};
+    CERTS.forEach((i) => {
+      const o = this.state.open[i];
+      certVals['ct' + i] = {
+        panelRef: this.panelRefs[i], contentRef: this.contentRefs[i],
+        expanded: o ? 'true' : 'false', rows: o ? '1fr' : '0fr', slide: o ? '0px' : '-16px',
+        opacity: o ? 1 : 0, chevron: o ? '180deg' : '0deg', border: o ? 'var(--ink)' : 'var(--border)',
+        toggle: () => this.toggle(i),
+        onKey: (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.toggle(i); }
+          else if (e.key === 'Escape' && this.state.open[i]) this.setOpen(i, false);
+        },
+      };
+    });
+    const cc = this.state.card;
+    const route = this.state.route, isHome = route === 'home';
+    const proj = PROJECTS.find(x => x.id === route) || PROJECTS[0];
+    const cur = isHome ? this.state.active : 'projects';
+    const nav = {};
+    for (const s of SECTIONS) nav[s] = { b: cur === s ? 'var(--ink)' : 'transparent', c: cur === s ? 'var(--ink)' : 'var(--muted)' };
+    const mo = this.state.menuOpen;
+    return {
+      ...this.cardHandlers(),
+      ...this.menuHandlers(),
+      themeOn: window.THEME_SWITCH !== false, isLight: this.state.theme === 'light', isDark: this.state.theme !== 'light',
+      themeLabel: this.state.theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode',
+      navPadX: window.THEME_SWITCH !== false ? '72px' : '24px',
+      toggleTheme: () => {
+        const t = this.state.theme === 'light' ? 'dark' : 'light';
+        try { localStorage.setItem('adi-theme', t); } catch (e) {}
+        this.applyTheme(t, true);
+      },
+      bgBlueprint: window.BACKGROUND !== 'topo', bgTopo: window.BACKGROUND === 'topo',
+      isHome, isProject: !isHome, project: proj, nav, pageRef: this.pageRef,
+      menuWrapRef: this.menuWrapRef, tabRef: this.tabRef,
+      menuExpanded: mo ? 'true' : 'false', menuOpacity: mo ? 1 : 0, menuVis: mo ? 'visible' : 'hidden', menuY: mo ? '0px' : '-6px',
+      ...Object.fromEntries(PROJECTS.map((x, i) => {
+        const on = !isHome && x.id === route;
+        return ['m' + i, { ref: this.itemRefs[i], current: on ? 'page' : 'false', border: on ? 'var(--ink)' : 'var(--border)', bg: on ? 'var(--surface-hover)' : 'transparent' }];
+      })),
+      goCerts: (e) => { e.preventDefault(); this.goSection('certifications'); },
+      goAwards: (e) => { e.preventDefault(); this.goSection('awards'); },
+      backToProjects: () => this.goSection('projects', true),
+      ...Object.fromEntries(CARD_IDS.map((id) => {
+        const rm = this.reduced(), a = cc === id, r = this.cardRefs[id];
+        return ['c' + id, { ...this.cardEv[id], wrapRef: r.wrap, panelRef: r.panel, contentRef: r.content, expanded: a ? 'true' : 'false', zoom: a ? 1.06 : 1, h: a ? 'var(--h, auto)' : '0px', slide: a ? '0px' : '-8px', panelOpacity: a ? 1 : 0, vis: a ? 'visible' : 'hidden',
+          tr: rm ? 'none' : (a ? 'height 240ms cubic-bezier(0.2, 0, 0, 1), opacity 240ms cubic-bezier(0.2, 0, 0, 1)' : 'height 180ms cubic-bezier(0.2, 0, 0, 1), opacity 180ms cubic-bezier(0.2, 0, 0, 1)'),
+          innerTr: rm ? 'none' : (a ? 'transform 240ms cubic-bezier(0.2, 0, 0, 1), opacity 240ms cubic-bezier(0.2, 0, 0, 1), visibility 0s' : 'transform 180ms cubic-bezier(0.2, 0, 0, 1), opacity 180ms cubic-bezier(0.2, 0, 0, 1), visibility 0s linear 180ms'), hintOpacity: a ? 0 : 1, frameBorder: a ? 'var(--ink)' : 'var(--rule)', linkTab: a ? 0 : -1 }];
+      })),
+      stopProp: (e) => { e.stopPropagation(); },
+      linkKey: (e) => {
+        if (e.key === 'Enter') e.stopPropagation();
+        else if (e.key === ' ') { e.preventDefault(); e.stopPropagation(); e.currentTarget.click(); }
+      },
+      ...certVals,
+      navRef: this.navRef,
+      goAbout: (e) => { e.preventDefault(); this.goSection('about'); },
+      hero: (() => {
+        const narrow = (this.state.colW || window.innerWidth) - 48 < 796;
+        return narrow
+          ? { cols: 'minmax(0, 1fr)', c: '1', headRow: '1', headH: 'clamp(300px, 60vw, 450px)', headMb: '12px', rPanel: '2', rP1: '3', rP2: '4', rP3: '5', rBtn: '6' }
+          : { cols: '348px minmax(0, 1fr)', c: '2', headRow: '1 / 6', headH: '100%', headMb: '0px', rPanel: '1', rP1: '2', rP2: '3', rP3: '4', rBtn: '5' };
+      })(),
+      colRef: this.colRef,
+      m: (() => {
+        const on = this.state.vw < 768, o = this.state.mobOpen;
+        return { on, open: on && o, openAttr: on && o ? 'true' : 'false', deskNav: on ? 'none' : 'flex', navMinH: on ? '38px' : '0px', wordLeft: on ? '16px' : 'calc(max(0px, (100% - 1128px) / 2) + 24px)', themeRight: on ? '16px' : '24px', padX: on ? '16px' : '24px', gridBg: on ? 'none' : 'linear-gradient(to right, var(--pg-major) 1px, transparent 1px), linear-gradient(to bottom, var(--pg-major) 1px, transparent 1px), linear-gradient(to right, var(--pg-minor) 1px, transparent 1px), linear-gradient(to bottom, var(--pg-minor) 1px, transparent 1px)', panelPad: on ? '24px' : '48px', panelPadP: on ? '24px' : '24px 48px', h2: on ? '36px' : '48px', tbGrid: on ? 'none' : 'grid' };
+      })(),
+      toggleMob: () => this.setState((s) => ({ mobOpen: !s.mobOpen })),
+      closeMob: () => this.setState({ mobOpen: false }),
+      mobAbout: (e) => { e.preventDefault(); this.setState({ mobOpen: false }); this.goSection('about'); },
+      mobCerts: (e) => { e.preventDefault(); this.setState({ mobOpen: false }); this.goSection('certifications'); },
+      mobAwards: (e) => { e.preventDefault(); this.setState({ mobOpen: false }); this.goSection('awards'); },
+      dimLabel: (this.state.colW || 0) + ' PX',
+      ...Object.fromEntries(['hero', 'projects', 'certs', 'awards'].map((k) => {
+        const pc = this.state.pcell, on = !!pc && pc.id === k, col = on ? pc.col : 0, row = on ? pc.row : 0;
+        const pad = (n) => String(n).padStart(2, '0');
+        return ['p_' + k, { x: col * 24 + 'px', y: row * 24 + 'px', op: on ? 1 : 0, label: String.fromCharCode(65 + Math.floor(col / 5)) + (Math.floor(row / 5) + 1) + ' · ' + pad(col) + ',' + pad(row) }];
+      })),
+      panelMove: (e) => {
+        if (!this.canHover) return;
+        this.pm = { el: e.currentTarget, x: e.clientX, y: e.clientY };
+        if (this.pmRaf) return;
+        this.pmRaf = requestAnimationFrame(() => {
+          this.pmRaf = 0;
+          const { el, x, y } = this.pm, r = el.getBoundingClientRect(), id = el.getAttribute('data-panel');
+          const col = Math.max(0, Math.min(Math.floor((r.width - 2) / 24), Math.floor((x - r.left) / 24)));
+          const row = Math.max(0, Math.min(Math.floor((r.height - 2) / 24), Math.floor((y - r.top) / 24)));
+          const pc = this.state.pcell;
+          if (!pc || pc.id !== id || pc.col !== col || pc.row !== row) this.setState({ pcell: { id, col, row } });
+        });
+      },
+      panelLeave: () => { cancelAnimationFrame(this.pmRaf); this.pmRaf = 0; if (this.state.pcell) this.setState({ pcell: null }); },
+    };
+  }
+}
+</script>
+</body>
+</html>
